@@ -13,6 +13,12 @@ const typeDefs = gql`
     hubs: HubConnection
   }
 
+  type ViewerPermissions {
+    view: Boolean
+    update: Boolean
+    delete: Boolean
+  }
+
   type Hub implements Node {
     id: ID!
     name: String
@@ -20,7 +26,7 @@ const typeDefs = gql`
   }
 
   type HubEdge {
-    viewerPermissions: [String]
+    viewerPermissions: ViewerPermissions
     node: Hub
   }
 
@@ -35,7 +41,7 @@ const typeDefs = gql`
   }
 
   type HubMemberEdge {
-    viewerPermissions: [String]
+    viewerPermissions: ViewerPermissions
     viewerAssignableRoles: [String]
     node: User
   }
@@ -55,28 +61,44 @@ const user = (_, { name }) => ({
 });
 
 const hub = () => ({
-  viewerPermissions: () => ['view', 'update', 'delete'],
+  viewerPermissions: () => ({
+    view: true,
+    update: true,
+    delete: true,
+  }),
   node: () => ({
     name: 'EITS',
     members: () => ({
       totalCount: 3,
       edges: () => [
         {
-          viewerPermissions: ['view', 'update'],
+          viewerPermissions: () => ({
+            view: true,
+            update: true,
+            delete: false,
+          }),
           viewerAssignableRoles: ['Approver', 'Agent'],
           node: () => ({
             name: 'Jaspaul',
           }),
         },
         {
-          viewerPermissions: ['view'],
+          viewerPermissions: () => ({
+            view: true,
+            update: false,
+            delete: false,
+          }),
           viewerAssignableRoles: [],
           node: () => ({
             name: 'Alec',
           }),
         },
         {
-          viewerPermissions: ['view'],
+          viewerPermissions: () => ({
+            view: true,
+            update: false,
+            delete: false,
+          }),
           viewerAssignableRoles: [],
           node: () => ({
             name: 'Spencer',
